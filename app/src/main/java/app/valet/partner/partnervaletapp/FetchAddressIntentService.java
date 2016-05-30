@@ -1,4 +1,4 @@
-package app.valet.customer.customervaletapp;
+package app.valet.partner.partnervaletapp;
 
 import android.app.IntentService;
 import android.content.Intent;

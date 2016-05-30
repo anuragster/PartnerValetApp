@@ -1,4 +1,4 @@
-package app.valet.customer.customervaletapp;
+package app.valet.partner.partnervaletapp;
 
 import android.os.AsyncTask;
 import android.util.Log;

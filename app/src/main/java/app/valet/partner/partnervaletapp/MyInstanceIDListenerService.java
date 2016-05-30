@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package app.valet.customer.customervaletapp;
+package app.valet.partner.partnervaletapp;
 
 import android.content.Intent;
 

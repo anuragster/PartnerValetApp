@@ -1,4 +1,4 @@
-package app.valet.customer.customervaletapp;
+package app.valet.partner.partnervaletapp;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -40,7 +40,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import app.valet.customer.customervaletapp.widget.state.SearchBoxState;
+import app.valet.partner.partnervaletapp.widget.state.SearchBoxState;
 
 public class MapsActivity extends FragmentActivity /*, PlaceSelectionListener */{
 

@@ -1,4 +1,4 @@
-package app.valet.customer.customervaletapp;
+package app.valet.partner.partnervaletapp;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -22,7 +22,7 @@ import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.LatLng;
 
-import app.valet.customer.customervaletapp.widget.state.SearchBoxState;
+import app.valet.partner.partnervaletapp.widget.state.SearchBoxState;
 
 /**
  * Created by ASAX on 28-05-2016.

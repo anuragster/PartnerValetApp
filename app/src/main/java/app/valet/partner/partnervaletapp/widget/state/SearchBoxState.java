@@ -1,4 +1,4 @@
-package app.valet.customer.customervaletapp.widget.state;
+package app.valet.partner.partnervaletapp.widget.state;
 
 import java.io.Serializable;
 

@@ -1,4 +1,4 @@
-package app.valet.customer.customervaletapp;
+package app.valet.partner.partnervaletapp;
 
 /**
  * Created by ASAX on 21-05-2016.
