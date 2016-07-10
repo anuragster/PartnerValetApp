@@ -42,6 +42,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import app.valet.partner.partnervaletapp.widget.state.SearchBoxState;
 
+
 public class MapsActivity extends FragmentActivity /*, PlaceSelectionListener */{
 
     private static final String TAG = "TAG";
@@ -52,7 +53,7 @@ public class MapsActivity extends FragmentActivity /*, PlaceSelectionListener */
     private int MY_PERMISSION_REQUEST_ACCESS_FINE_LOCATION = 2;
     private GoogleApiClient mGoogleApiClient;
     private GoogleApiClient.ConnectionCallbacks callbacks;
-    private GoogleApiClient.OnConnectionFailedListener connectionFailedListener;
+    //private GoogleApiClient.OnConnectionFailedListener connectionFailedListener;
     public GoogleMap map;
     //private LocationCoordinator locationManager;
     public TextView mTextView;
@@ -142,6 +143,9 @@ public class MapsActivity extends FragmentActivity /*, PlaceSelectionListener */
                 }
             }
         });
+        Intent locationServiceIntent = new Intent(mapActivity, LocationUpdateService.class);
+        //locationServiceIntent.setData
+        mapActivity.startService(locationServiceIntent);
         isMapScreenLoaded = true;
     }
 
@@ -158,7 +162,7 @@ public class MapsActivity extends FragmentActivity /*, PlaceSelectionListener */
         LocationCoordinator.getInstance(this).startIntentService();
     }
 
-    @TargetApi(23)
+    //@TargetApi(23)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -329,8 +333,8 @@ public class MapsActivity extends FragmentActivity /*, PlaceSelectionListener */
         //LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
         //isReceiverRegistered = false;
         Log.e(TAG, "onPause");
-        // Stop location updates to save battery power.
-        LocationCoordinator.getInstance(this).removeLocationUpdates();
+        // Stop location updates to save battery power. However, we need to keep location updates coming for partner app even onPause.
+        //LocationCoordinator.getInstance(this).removeLocationUpdates();
     }
 
     private void launchGoogleMapSearchOverlay(){

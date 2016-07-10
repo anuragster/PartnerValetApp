@@ -29,7 +29,7 @@ import app.valet.partner.partnervaletapp.widget.state.SearchBoxState;
  */
 public class LocationCoordinator implements LocationListener{
     private static final String TAG = "TAG";
-    private static final long MIN_TIME = 0/*400*/;
+    private static final long MIN_TIME = 0 /*30000/*400*/;
     private static final float MIN_DISTANCE = 0/*1000*/;
     private int MY_PERMISSION_REQUEST_ACCESS_FINE_LOCATION = 2;
     private GoogleApiClient mGoogleApiClient;
@@ -41,22 +41,27 @@ public class LocationCoordinator implements LocationListener{
     public LocationListener listener;
     private Activity mapActivity;
     private static volatile LocationCoordinator INSTANCE;
+    private volatile boolean locationUpdateRequested = false;
 
     public boolean isLocationSet(){
         return mLastLocation!=null;
     }
 
     public void requestLocationUpdates(){
-        if(checkPermission()) {
+        if(checkPermission() && !locationUpdateRequested) {
+            Log.e("Location", "requestLocationUpdates");
             locationManager.requestLocationUpdates(android.location.LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, this);
             locationManager.requestLocationUpdates(android.location.LocationManager.GPS_PROVIDER, MIN_TIME, MIN_DISTANCE, this);
+            locationUpdateRequested = true;
         }
     }
 
     public void removeLocationUpdates(){
-        if(checkPermission()) {
+        Log.e("Location", "removeLocationUpdates");
+        if(checkPermission() && locationUpdateRequested) {
             locationManager.removeUpdates(this);
             locationManager.removeUpdates(this);
+            locationUpdateRequested = false;
         }
     }
 
@@ -78,6 +83,13 @@ public class LocationCoordinator implements LocationListener{
     @TargetApi(23)
     @Override
     public void onLocationChanged(Location location) {
+        Log.e(TAG, "Location update received. Location - " + location + " and device id - " + LocationUpdateHTTPPost.deviceLocationId);
+        if(LocationUpdateHTTPPost.deviceLocationId!=null) {
+            LocationUpdateHTTPPost locationUpadtePost = new LocationUpdateHTTPPost();
+            locationUpadtePost.setLocation(location);
+            locationUpadtePost.execute();
+        }
+
         if(mapActivity!=null && mapActivity instanceof MapsActivity) {
             if (((MapsActivity) mapActivity).isPlaceSelected) {
                 return;

@@ -1,12 +1,12 @@
 {
   "project_info": {
-    "project_number": "770030966973",
-    "project_id": "tokyo-scholar-132723"
+    "project_number": "210578425825",
+    "project_id": "partnerapp-b72f1"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:770030966973:android:e7845a8c7f75a245",
+        "mobilesdk_app_id": "1:210578425825:android:e7845a8c7f75a245",
         "android_client_info": {
           "package_name": "app.valet.partner.partnervaletapp"
         }
@@ -14,7 +14,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDvZ1TlRIfSiUHrQmYvD_xD_YlkGPBYOME"
+          "current_key": "AIzaSyDOMaDsnimIkGiALU3EViPP4tWn2sTHvYY"
         }
       ],
       "services": {

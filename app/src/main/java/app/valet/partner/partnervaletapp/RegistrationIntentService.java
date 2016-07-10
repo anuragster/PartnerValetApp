@@ -27,7 +27,14 @@ import com.google.android.gms.gcm.GcmPubSub;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class RegistrationIntentService extends IntentService {
 
@@ -88,6 +95,82 @@ public class RegistrationIntentService extends IntentService {
      */
     private void sendRegistrationToServer(String token) {
         // Add custom implementation, as needed.
+        if(LocationUpdateHTTPPost.deviceLocationId ==  null){
+            registerDevice(token);
+        }
+    }
+
+    private void registerDevice(String id){
+        HttpURLConnection urlConnection = null;
+        BufferedReader reader = null;
+        Log.e("NodeJS", "Registering device!!");
+        DataOutputStream dos = null;
+        try {
+            URL url = new URL("http://52.33.192.176:8080/partner/register/6780ccbf42e584eb3cbc848b/"+id);
+
+
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setDoOutput(true);
+            urlConnection.setRequestProperty("Content-Type", "application/json");
+            urlConnection.setRequestMethod("POST");
+            urlConnection.setUseCaches(false);
+            urlConnection.connect();
+
+            dos = new DataOutputStream(urlConnection.getOutputStream());
+
+
+            JSONObject object = new JSONObject();
+
+            object.put("name", "Anurag");
+            dos.write(object.toString().getBytes("UTF-8"));
+            dos.flush();
+            Log.e("NodeJS", "Before Response code");
+            int responseCode = urlConnection.getResponseCode();
+
+            Log.e("NodeJS", "Response code - " + responseCode);
+
+            if(200 == responseCode){
+                BufferedReader in = new BufferedReader(
+                        new InputStreamReader(urlConnection.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                if(response.length()>0) {
+                    JSONObject jsonObject = new JSONObject(response.toString());
+                    String token = jsonObject.getString("_id");
+                    if(token!=null && token.trim().length()>0){
+                        Log.e("Device Reg", "Registered GCM token " + token + " for device successfully!!");
+                        LocationUpdateHTTPPost.deviceLocationId = token;
+                    }
+                }
+                in.close();
+            }
+        } catch (Exception e) {
+            Log.e("TAG", "Error " + e);
+        } finally{
+            if(dos != null){
+                try{
+                    dos.close();
+                }catch(final IOException e){
+                    System.out.println("Error closing stream" + e);
+                }
+            }
+
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
+
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (final IOException e) {
+                    System.out.println("Error closing stream" + e);
+                }
+            }
+        }
     }
 
     /**
