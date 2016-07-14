@@ -26,6 +26,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.RemoteViews;
 
 import com.google.android.gms.gcm.GcmListenerService;
 
@@ -78,6 +79,8 @@ public class MyGcmListenerService extends GcmListenerService {
      */
     private void sendNotification(String message) {
         try{
+            RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.newrequest);
+
             Intent intent = new Intent(this, MapsActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
@@ -86,19 +89,25 @@ public class MyGcmListenerService extends GcmListenerService {
             Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                     .setSmallIcon(R.drawable.ic_stat_maps_local_parking)
-                    .setContentTitle("Valet is assigned")
+                    .setContentTitle("New Parking Request")
                     .setContentText(message)
                     .setAutoCancel(true)
                     .setSound(defaultSoundUri)
                     .setContentIntent(pendingIntent)
+                    //.setContent(remoteViews)
                     .setPriority(Notification.PRIORITY_HIGH)
-                    .setStyle(new NotificationCompat.BigPictureStyle());
+                    //.setStyle(new NotificationCompat.BigPictureStyle());
+                    .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
+                    //.addAction(R.drawable.ic_clear_black_48dp, "reject", pendingIntent)
+                    .addAction(R.drawable.ic_done_black_48dp, "accept", pendingIntent);
                     //.setLargeIcon(MediaStore.Images.Media.getBitmap(this.getContentResolver(), Uri.parse("https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcQhpmUEpJkcqNP1FbwjRdwM6VB_CHsauOaiGXn8UaIGU8HzteLBsA")));
 
             NotificationManager notificationManager =
                     (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-            notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+            Notification notification = notificationBuilder.build();
+            notification.flags |= Notification.FLAG_AUTO_CANCEL;
+            notificationManager.notify(0 /* ID of notification */, notification);
         }catch(Exception e){
             Log.e(TAG, e.toString());
         }
