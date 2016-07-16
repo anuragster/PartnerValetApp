@@ -57,7 +57,8 @@ public class MapsActivity extends FragmentActivity /*, PlaceSelectionListener */
     public GoogleMap map;
     //private LocationCoordinator locationManager;
     public TextView mTextView;
-    private Button mParkNow;
+    private Button mOfflineOnlineButton;
+    private boolean isOnline;
     private ImageView myLocation;
     public boolean isPlaceSelected; // Saved state
     //protected Location mLastLocation;
@@ -76,8 +77,12 @@ public class MapsActivity extends FragmentActivity /*, PlaceSelectionListener */
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private BroadcastReceiver mRegistrationBroadcastReceiver;
     private boolean isReceiverRegistered;
+    //private String gcmToken;
     // GCM ends
 
+    public void setStatus(boolean value){
+        this.isOnline = value;
+    }
 
     class AddressResultReceiver extends ResultReceiver {
         private Creator CREATOR;
@@ -109,6 +114,7 @@ public class MapsActivity extends FragmentActivity /*, PlaceSelectionListener */
 
     private void initMapUI(){
         //setContentView(R.layout.activity_maps);
+
         this.mTextView = (TextView) findViewById(R.id.email_address);
         this.mTextView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -116,14 +122,20 @@ public class MapsActivity extends FragmentActivity /*, PlaceSelectionListener */
                 launchGoogleMapSearchOverlay();
             }
         });
-        this.mParkNow = (Button) findViewById(R.id.park_now);
-        this.mParkNow.setOnClickListener(new View.OnClickListener(){
+        //final String gcmToken = this.gcmToken;
+        MapsActivity activity = this;
+        this.mOfflineOnlineButton = (Button) findViewById(R.id.park_now);
+
+        (new OnlineStatusTask(mOfflineOnlineButton, this)).execute();
+
+        this.mOfflineOnlineButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                Log.e(TAG, "Button Clicked. Parameters - " + currentSearchBoxState);
-                (new ParkNowClickHTTPPost()).execute();
+                Log.e(TAG, "Button Clicked. Parameters - " + isOnline);
+                (new OnlineOfflineToggleTask(mOfflineOnlineButton, mapActivity, !isOnline)).execute();
             }
         });
+
         updateUI();
         this.myLocation = (ImageView) findViewById(R.id.my_location);
         this.myLocation.setOnClickListener(new View.OnClickListener(){
@@ -162,16 +174,21 @@ public class MapsActivity extends FragmentActivity /*, PlaceSelectionListener */
         LocationCoordinator.getInstance(this).startIntentService();
     }
 
+
+
     //@TargetApi(23)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.e(TAG, "onCreate!!");
+        Intent splashIntent = getIntent();
+        isOnline = splashIntent.getBooleanExtra("online", false);
+        Log.e(TAG, "onCreate!! IsOnline - " + isOnline);
         mapActivity = this;
         LocationCoordinator lc = LocationCoordinator.getInstance(this);
 
         //setContentView(R.layout.activity_splash);
         setContentView(R.layout.activity_maps);
+        //initGCMToken();
         initMapUI();
         mResultReceiver = new AddressResultReceiver(new Handler());
         map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();

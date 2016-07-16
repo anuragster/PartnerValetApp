@@ -38,11 +38,15 @@
             android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|center_horizontal"
-            android:text="Valet PARK NOW"
+            android:text="OFFLINE"
             android:textSize="20dp"
             android:layout_marginBottom="10dp"
-            android:textColor="#FFFFFF"
+            android:textColor="#000000"
             android:padding="10dp"
             android:textCursorDrawable="@null"
-            android:background="#4d94ff"/>
+            android:background="#ffffff"
+
+    />
+    <!--android:textColor="#FFFFFF"-->
+    <!--android:background="#4d94ff"-->
 </fragment>

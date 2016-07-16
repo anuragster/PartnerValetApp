@@ -6,6 +6,14 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.android.gms.iid.InstanceID;
+
+import app.valet.partner.partnervaletapp.dao.Partner;
+import app.valet.partner.partnervaletapp.util.HttpUtil;
+import app.valet.partner.partnervaletapp.util.JsonUtil;
+import app.valet.partner.partnervaletapp.util.StringUtils;
+
 public class SplashActivity extends Activity {
     private static final String TAG = "TAG";
     /** Duration of wait **/
@@ -33,10 +41,10 @@ public class SplashActivity extends Activity {
         new LongOperation().execute("");
     }
 
-    private class LongOperation extends AsyncTask<String, Void, String> {
+    private class LongOperation extends AsyncTask<String, Void, Partner> {
 
         @Override
-        protected String doInBackground(String... params) {
+        protected Partner doInBackground(String... params) {
             //some heavy processing resulting in a Data String
             /*for (int i = 0; i < 5; i++) {
                 try {
@@ -46,24 +54,38 @@ public class SplashActivity extends Activity {
                 }
             }*/
             //return "whatever result you have";
-            while(!LocationCoordinator.getInstance(splashActivity).isLocationSet()){
-                Log.e(TAG, "Location is not set!!");
-                try {
-                    Thread.sleep(100);
-                }catch(Exception e){
+            Partner partner = null;
+            try {
+                while (!LocationCoordinator.getInstance(splashActivity).isLocationSet()) {
+                    Log.e(TAG, "Location is not set!!");
+                    try {
+                        Thread.sleep(100);
+                    } catch (Exception e) {
 
+                    }
                 }
+                Log.e(TAG, "Location is set now!!");
+                InstanceID instanceID = InstanceID.getInstance(getApplicationContext());
+                String token = instanceID.getToken(getString(R.string.gcm_defaultSenderId),
+                        GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
+
+                partner = getPartner(token);
+                Log.e("splash", "partner - " + partner);
+            }catch (Exception e){
+                Log.e("Exception", "e - " + e);
             }
-            Log.e(TAG, "Location is set now!!");
 
-
-            return null;
+            return partner;
         }
 
         @Override
-        protected void onPostExecute(String result) {
+        protected void onPostExecute(Partner result) {
             Intent i = new Intent(splashActivity, MapsActivity.class);
-            //i.putExtra("data", result);
+
+            if(result!=null) {
+                Log.e("splash", "result - " + result.getStatus());
+                i.putExtra("online", "AVAILABLE".equals(result.getStatus()));
+            }
             startActivity(i);
             finish();
         }
@@ -75,5 +97,16 @@ public class SplashActivity extends Activity {
 
         @Override
         protected void onProgressUpdate(Void... values) {}
+
+        private Partner getPartner(String token) throws Exception{
+            String response = HttpUtil.sendGet("http://52.33.192.176:8080/partner/register/" + token);
+            if(StringUtils.isEmpty(response)){
+                return null;
+            }
+            Log.e("splash", "response --> " + response);
+            return JsonUtil.fromJsonToObj(response, Partner.class);
+        }
+
+
     }
 }
